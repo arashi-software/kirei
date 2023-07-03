@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+name=$1
+desc=$2
+mv -vf src/example.nim "src/$name.nim"
+rm example.nimble
+echo "# Package
+
+version       = \"0.1.0\"
+author        = \"Luke\"
+description   = \"$desc\"
+license       = \"GPL-3.0-or-later\"
+srcDir        = \"src\"
+binDir        = \"bin\"
+bin           = @[\"$name\"]
+
+
+# Dependencies
+
+requires \"nim >= 1.4.8\"" >> "$name.nimble"
+rm init
