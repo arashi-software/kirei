@@ -1,59 +1,38 @@
-import std/[os, asyncdispatch, strformat, options, strutils, times]
+import std/[os, asyncdispatch, strformat, options, strutils, times, macros, random]
 import dotenv; load()
+import imports
 import dimscord,
        dimscmd,
        limdb,
        flatty
 
-type
-  SnipeMessage = object
-    authorName: string
-    authorPfp: string
-    timestamp: string
-    content: string
-  
-
 let kirei = newDiscordClient(getEnv("TOKEN"))
 var cmd = kirei.newHandler()
 let db = initDatabase("db", (snipe: string))
+var hmid: Message
 
 # Import all shared components
-include ../share/[
-  embeds,
-  procs
-]
+importAll("share")
 
 # Register all events
-include ../events/[
-  ready,
-  msgcreate,
-  msgdelete
-]
+importAll("events")
 
 # Register all message commands
-include ../commands/fun/[
-  snipe
-]
+importAll("commands", true)
 
-include ../commands/util/[
-  ping,
-  help
-]
-
-cmd.addChat("help") do (cmd: Option[string]):
-  if not cmd.isSome():
-    var opts: seq[SelectMenuOption]
-    for file in walkDir("commands", relative = true):
-      if file.kind == pcDir:
-        opts.add(newMenuOption(file.path.capitalizeAscii(), file.path))
-    var row = newActionRow()
-    row &= newSelectMenu("helpSlm", opts, placeholder = "Select a category")
+cmd.addChat("gamble") do (user1: User, user2: Option[User]):
+  try:
+    randomize()
+    var users = @[user1]
+    if user2.isNone(): users.add(msg.author)
+    else: users.add(user2.get())
+    let winner = sample(users)
     discard await kirei.api.sendMessage(msg.channelID, embeds = @[Embed(
       author: some EmbedAuthor(name: msg.author.username, icon_url: some msg.author.avatarUrl()),
-      title: some "Kirei Commands",
-      description: some "Select a category to view commands",
+      title: some "The winner is $#" % [winner.username],
       color: some 0x6f93b6
-    )], components = @[row])    
-
+    )])
+  except CatchableError:
+    discard await kirei.api.sendMessage(msg.channelID, embeds = @[errEmbed(getCurrentExceptionMsg())])
 
 waitFor kirei.startSession() 
