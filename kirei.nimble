@@ -11,4 +11,4 @@ bin           = @["kirei"]
 
 # Dependencies
 
-requires "nim >= 1.4.8", "dimscord", "dimscmd", "limdb", "flatty", "dotenv"
+requires "nim >= 1.4.8", "dimscord", "dimscmd", "limdb", "flatty", "dotenv", "jsony", "puppy"
