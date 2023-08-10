@@ -1,3 +1,6 @@
+## gamble <user1> <?user2>
+## Gamble with a user and show the winner
+
 cmd.addChat("gamble") do (user1: User, user2: Option[User]):
   try:
     randomize()
