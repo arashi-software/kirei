@@ -1,3 +1,6 @@
+## kmk
+## Send a random anime charecter and poll if you would kiss, marry, or kill the charecter
+
 type
   CHJpg = object
     imageUrl: string
